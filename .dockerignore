@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
+
+# Documentation
+docs
+*.md
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage
+.nyc_output
+
+# Build
+build
+dist
+
+# Git
+.git
+.gitignore
+
+# Drizzle
+drizzle
+
+# Package files (already copied separately)
+package-lock.json

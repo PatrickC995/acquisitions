@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Neon Local Database
+  neon-local:
+    image: neondatabase/neon-local:latest
+    container_name: neon-local
+    ports:
+      - "5432:5432"
+    environment:
+      - NEON_DATABASE_NAME=acquisitions
+      - NEON_DATABASE_OWNER=appuser
+      - NEON_DATABASE_OWNER_PASSWORD=appuser
+      # Auto-create branches for development
+      - NEON_AUTO_BRANCH=true
+    volumes:
+      # Persist data between restarts
+      - neon-local-data:/var/lib/neon
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d acquisitions -h localhost -p 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - app-network
+
+  # Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: acquisitions-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://appuser:appuser@neon-local:5432/acquisitions
+      - PORT=3000
+    env_file:
+      - .env.development
+    depends_on:
+      neon-local:
+        condition: service_healthy
+    volumes:
+      # Mount source code for live reload
+      - .:/app
+      # Keep node_modules isolated
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - app-network
+
+volumes:
+  neon-local-data:
+
+networks:
+  app-network:
+    driver: bridge
