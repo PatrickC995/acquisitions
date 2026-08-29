@@ -42,5 +42,3 @@ dist
 # Drizzle
 drizzle
 
-# Package files (already copied separately)
-package-lock.json
