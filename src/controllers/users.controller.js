@@ -3,9 +3,17 @@ import { getAllUsers, getUserById, updateUser, deleteUser } from "#services/user
 import { userIdSchema, updateUserSchema } from "#validations/users.validation.js";
 import { formatvalidationError } from "#utils/format.js";
 
+
 export const fetchAllUsers = async (req, res) => {
     try {
         logger.info("Getting users...");
+
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Only admin users can fetch all users'
+            });
+        }
 
         const users = await getAllUsers();
 
@@ -24,6 +32,7 @@ export const fetchAllUsers = async (req, res) => {
     }
 };
 
+
 export const fetchUserById = async (req, res) => {
     try {
         logger.info("Getting user by ID...");
@@ -40,7 +49,16 @@ export const fetchUserById = async (req, res) => {
             });
         }
 
-        const user = await getUserById(validationResult.data.id);
+        const userId = validationResult.data.id;
+
+        if (req.user.id !== userId && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'You can only access your own information'
+            });
+        }
+
+        const user = await getUserById(userId);
 
         res.status(200).json({
             success: true,
@@ -63,6 +81,7 @@ export const fetchUserById = async (req, res) => {
         });
     }
 };
+
 
 export const updateUserById = async (req, res) => {
     try {
@@ -133,6 +152,7 @@ export const updateUserById = async (req, res) => {
     }
 };
 
+
 export const deleteUserById = async (req, res) => {
     try {
         logger.info("Deleting user...");
@@ -151,10 +171,10 @@ export const deleteUserById = async (req, res) => {
 
         const userId = validationResult.data.id;
 
-        if (req.user.id !== userId && req.user.role !== 'admin') {
+        if (req.user.role !== 'admin') {
             return res.status(403).json({
                 success: false,
-                message: 'You can only delete your own account'
+                message: 'Only admin users can delete users'
             });
         }
 
