@@ -132,6 +132,7 @@ export const updateUserById = async (req, res) => {
 
         res.status(200).json({
             success: true,
+            message: 'Update successful',
             data: updatedUser
         });
 
