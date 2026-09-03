@@ -9,6 +9,7 @@ import securityMiddleware from '#middleware/security.middleware.js'
 import userRoutes from '#routes/users.routes.js'
 import { error } from 'winston';
 
+
 const app = express();
 
 app.use(helmet());
