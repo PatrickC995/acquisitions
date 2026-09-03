@@ -33,7 +33,7 @@ jobs:
             type=ref,event=branch
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=prod-${{ format('{0,date=YYYYMMDD-HHmmss}', github.event.head_commit.timestamp) }},enable={{is_default_branch}}
+            type=raw,value=prod-${{ github.event.head_commit.timestamp }},enable={{is_default_branch}}
 
       - name: Build and push
         uses: docker/build-push-action@v6

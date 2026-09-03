@@ -4,7 +4,7 @@ import db from '#config/database.js';
 import { eq } from 'drizzle-orm';
 import { users } from '#models/user.model.js';
 
-export const hashPassword = async (password) => {
+export const hashPassword = async password => {
   try {
     return await bcrypt.hash(password, 10);
   } catch (e) {
@@ -22,12 +22,7 @@ export const comparePassword = async (password, hashedPassword) => {
   }
 };
 
-export const createUser = async ({
-  name,
-  email,
-  password,
-  role
-}) => {
+export const createUser = async ({ name, email, password, role }) => {
   try {
     const existingUser = await db
       .select()
@@ -47,14 +42,14 @@ export const createUser = async ({
         name,
         email,
         password: passwordHash,
-        role
+        role,
       })
       .returning({
         id: users.id,
         name: users.name,
         email: users.email,
         role: users.role,
-        createdAt: users.createdAt
+        createdAt: users.createdAt,
       });
 
     logger.info(`User ${newUser.email} created successfully`);
@@ -66,10 +61,7 @@ export const createUser = async ({
   }
 };
 
-export const authenticateUser = async ({
-  email,
-  password
-}) => {
+export const authenticateUser = async ({ email, password }) => {
   try {
     const [user] = await db
       .select()
@@ -81,10 +73,7 @@ export const authenticateUser = async ({
       throw new Error('User not found');
     }
 
-    const passwordMatches = await comparePassword(
-      password,
-      user.password
-    );
+    const passwordMatches = await comparePassword(password, user.password);
 
     if (!passwordMatches) {
       throw new Error('Invalid password');
@@ -96,7 +85,7 @@ export const authenticateUser = async ({
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
     };
   } catch (e) {
     logger.error(`Authentication error: ${e.message}`);

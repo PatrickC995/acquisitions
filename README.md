@@ -15,22 +15,26 @@ A Node.js application using Express, Neon Database, and Drizzle ORM.
 The development environment uses **Neon Local** running in Docker, which provides an ephemeral PostgreSQL database that automatically creates branches for testing.
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/PatrickC995/acquisitions.git
    cd acquisitions
    ```
 
 2. **Copy the development environment file:**
+
    ```bash
    cp .env.example .env.development
    ```
 
    The `.env.development` file already contains the Neon Local connection string:
+
    ```
    DATABASE_URL=postgres://appuser:appuser@neon-local:5432/acquisitions
    ```
 
 3. **Start the development environment:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml up --build
    ```
@@ -45,12 +49,14 @@ The development environment uses **Neon Local** running in Docker, which provide
    - Database: Accessible at `localhost:5432` (from host) or `neon-local:5432` (from other containers)
 
 5. **Run database migrations:**
+
    ```bash
    # Exec into the running app container
    docker exec -it acquisitions-app npm run db:migrate
    ```
 
 6. **Stop the development environment:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml down
    ```
@@ -71,11 +77,13 @@ The production environment connects directly to your **Neon Cloud Database**.
    - Format: `postgres://user:password@ep-cool-name-123456.us-east-2.aws.neon.tech/dbname?sslmode=require`
 
 2. **Configure production environment:**
+
    ```bash
    cp .env.example .env.production
    ```
 
    Edit `.env.production` and set:
+
    ```
    DATABASE_URL=your_neon_cloud_connection_string
    JWT_SECRET=your_strong_production_secret
@@ -83,6 +91,7 @@ The production environment connects directly to your **Neon Cloud Database**.
    ```
 
 3. **Build and run in production:**
+
    ```bash
    docker-compose -f docker-compose.prod.yml build
    docker-compose -f docker-compose.prod.yml up -d
@@ -100,30 +109,31 @@ The production environment connects directly to your **Neon Cloud Database**.
 
 ### Development (`.env.development`)
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NODE_ENV` | Environment mode | `development` |
-| `PORT` | Application port | `3000` |
+| Variable       | Description           | Default                                                   |
+| -------------- | --------------------- | --------------------------------------------------------- |
+| `NODE_ENV`     | Environment mode      | `development`                                             |
+| `PORT`         | Application port      | `3000`                                                    |
 | `DATABASE_URL` | Neon Local connection | `postgres://appuser:appuser@neon-local:5432/acquisitions` |
-| `JWT_SECRET` | JWT signing secret | (random dev value) |
-| `LOG_LEVEL` | Logging level | `debug` |
+| `JWT_SECRET`   | JWT signing secret    | (random dev value)                                        |
+| `LOG_LEVEL`    | Logging level         | `debug`                                                   |
 
 ### Production (`.env.production`)
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NODE_ENV` | Environment mode | `production` |
-| `PORT` | Application port | `3000` |
-| `DATABASE_URL` | Neon Cloud connection | **Yes** |
-| `JWT_SECRET` | JWT signing secret | **Yes** |
-| `ARCJET_KEY` | ArcJet security key | Optional |
-| `LOG_LEVEL` | Logging level | `info` |
+| Variable       | Description           | Required     |
+| -------------- | --------------------- | ------------ |
+| `NODE_ENV`     | Environment mode      | `production` |
+| `PORT`         | Application port      | `3000`       |
+| `DATABASE_URL` | Neon Cloud connection | **Yes**      |
+| `JWT_SECRET`   | JWT signing secret    | **Yes**      |
+| `ARCJET_KEY`   | ArcJet security key   | Optional     |
+| `LOG_LEVEL`    | Logging level         | `info`       |
 
 ## Database Setup
 
 ### Neon Local (Development)
 
 Neon Local is automatically configured in `docker-compose.dev.yml`:
+
 - **Image:** `neondatabase/neon-local:latest`
 - **Database:** `acquisitions`
 - **Owner:** `appuser`
@@ -145,6 +155,7 @@ The database persists data in a Docker volume (`neon-local-data`) between contai
 ### `Dockerfile`
 
 Multi-stage build for production:
+
 - Uses `node:20-alpine` for minimal image size
 - Copies package files and installs production dependencies
 - Copies source code
@@ -154,6 +165,7 @@ Multi-stage build for production:
 ### `docker-compose.dev.yml`
 
 Development configuration:
+
 - **Neon Local:** Database service with auto-branch enabled
 - **App:** Application with live reload, connected to Neon Local
 - **Network:** Shared bridge network for inter-container communication
@@ -161,6 +173,7 @@ Development configuration:
 ### `docker-compose.prod.yml`
 
 Production configuration:
+
 - **App:** Production-ready container with health checks
 - **Restart:** Auto-restart on failure
 - **Network:** Isolated bridge network
@@ -170,6 +183,7 @@ Production configuration:
 If you prefer to run the app locally without Docker:
 
 1. **Start Neon Local separately:**
+
    ```bash
    docker run -d --name neon-local -p 5432:5432 \
      -e NEON_DATABASE_NAME=acquisitions \
@@ -181,11 +195,13 @@ If you prefer to run the app locally without Docker:
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Create `.env.development`:**
+
    ```
    DATABASE_URL=postgres://appuser:appuser@localhost:5432/acquisitions
    JWT_SECRET=dev_secret
@@ -219,6 +235,7 @@ npm run db:studio
 ## Health Check
 
 The application includes a health check endpoint:
+
 - **URL:** `GET /health`
 - **Response:** `{ "status": "ok" }`
 

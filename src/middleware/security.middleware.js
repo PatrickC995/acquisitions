@@ -9,7 +9,7 @@ const securityMiddleware = async (req, res, next) => {
     let limit;
     let message;
 
-    switch(role) {
+    switch (role) {
       case 'admin':
         limit = 20;
         message = 'Admin request limit exceeded (20 per minute). Slow down.';
@@ -24,12 +24,14 @@ const securityMiddleware = async (req, res, next) => {
         break;
     }
 
-    const client = aj.withRule(slidingWindow({
-      mode: 'LIVE',
-      interval: '1m',
-      max: limit,
-      name: `${role}-rate-limit`
-    }));
+    const client = aj.withRule(
+      slidingWindow({
+        mode: 'LIVE',
+        interval: '1m',
+        max: limit,
+        name: `${role}-rate-limit`,
+      })
+    );
 
     const decision = await client.protect(req);
 
@@ -37,11 +39,11 @@ const securityMiddleware = async (req, res, next) => {
       logger.warn('Bot request blocked', {
         ip: req.ip,
         userAgent: req.get('User-Agent'),
-        path: req.path
+        path: req.path,
       });
       return res.status(403).json({
         error: 'Forbidden',
-        message: 'Automated requests are not allowed'
+        message: 'Automated requests are not allowed',
       });
     }
 
@@ -50,11 +52,11 @@ const securityMiddleware = async (req, res, next) => {
         ip: req.ip,
         userAgent: req.get('User-Agent'),
         path: req.path,
-        method: req.method
+        method: req.method,
       });
       return res.status(403).json({
         error: 'Forbidden',
-        message: 'Request blocked by security policy'
+        message: 'Request blocked by security policy',
       });
     }
 
@@ -62,20 +64,21 @@ const securityMiddleware = async (req, res, next) => {
       logger.warn('Rate limit exceeded', {
         ip: req.ip,
         userAgent: req.get('User-Agent'),
-        path: req.path
+        path: req.path,
       });
-      return res.status(429).json({  // Changed from 403 to 429 (Too Many Requests)
+      return res.status(429).json({
+        // Changed from 403 to 429 (Too Many Requests)
         error: 'Too Many Requests',
-        message
+        message,
       });
     }
 
     next();
-  } catch(e) {
+  } catch (e) {
     logger.error('Arcjet middleware error', { error: e });
     return res.status(500).json({
       error: 'Internal server error',
-      message: 'Something went wrong with security middleware'
+      message: 'Something went wrong with security middleware',
     });
   }
 };

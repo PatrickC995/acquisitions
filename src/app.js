@@ -19,8 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   morgan('combined', {
     stream: {
-      write: (message) => logger.info(message.trim())
-    }
+      write: message => logger.info(message.trim()),
+    },
   })
 );
 
@@ -37,13 +37,13 @@ app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
   });
 });
 
 app.get('/api', (req, res) => {
   res.status(200).json({
-    message: 'Acquisitions API is running'
+    message: 'Acquisitions API is running',
   });
 });
 
@@ -51,7 +51,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 app.use((req, res) => {
-  res.status(404).json({error: 'Route not found'});
+  res.status(404).json({ error: 'Route not found' });
 });
 
 export default app;
