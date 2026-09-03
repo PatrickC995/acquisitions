@@ -1,7 +1,7 @@
 export const formatvalidationError = (errors) => {
-    if (!errors || !Array.isArray(errors)) {
-        return 'Validation failed';
-    }
+  if (!errors || !Array.isArray(errors)) {
+    return 'Validation failed';
+  }
 
-    return errors.map(i => i.message).join(', ');
+  return errors.map(i => i.message).join(', ');
 };

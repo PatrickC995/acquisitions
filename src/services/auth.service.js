@@ -4,108 +4,102 @@ import db from '#config/database.js';
 import { eq } from 'drizzle-orm';
 import { users } from '#models/user.model.js';
 
-
 export const hashPassword = async (password) => {
-    try {
-        return await bcrypt.hash(password, 10);
-    } catch (e) {
-        logger.error(`Error hashing password: ${e.message}`);
-        throw new Error('Error hashing password');
-    }
+  try {
+    return await bcrypt.hash(password, 10);
+  } catch (e) {
+    logger.error(`Error hashing password: ${e.message}`);
+    throw new Error('Error hashing password', { cause: e });
+  }
 };
-
 
 export const comparePassword = async (password, hashedPassword) => {
-    try {
-        return await bcrypt.compare(password, hashedPassword);
-    } catch (e) {
-        logger.error(`Error comparing password: ${e.message}`);
-        throw new Error('Error comparing password');
-    }
+  try {
+    return await bcrypt.compare(password, hashedPassword);
+  } catch (e) {
+    logger.error(`Error comparing password: ${e.message}`);
+    throw new Error('Error comparing password', { cause: e });
+  }
 };
-
 
 export const createUser = async ({
-    name,
-    email,
-    password,
-    role
+  name,
+  email,
+  password,
+  role
 }) => {
-    try {
-        const existingUser = await db
-            .select()
-            .from(users)
-            .where(eq(users.email, email))
-            .limit(1);
+  try {
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
-        if (existingUser.length > 0) {
-            throw new Error('User already exists');
-        }
-
-        const passwordHash = await hashPassword(password);
-
-        const [newUser] = await db
-            .insert(users)
-            .values({
-                name,
-                email,
-                password: passwordHash,
-                role
-            })
-            .returning({
-                id: users.id,
-                name: users.name,
-                email: users.email,
-                role: users.role,
-                createdAt: users.createdAt
-            });
-
-        logger.info(`User ${newUser.email} created successfully`);
-
-        return newUser;
-
-    } catch (e) {
-        logger.error(`Error creating user: ${e.message}`);
-        throw e;
+    if (existingUser.length > 0) {
+      throw new Error('User already exists');
     }
+
+    const passwordHash = await hashPassword(password);
+
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        name,
+        email,
+        password: passwordHash,
+        role
+      })
+      .returning({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: users.role,
+        createdAt: users.createdAt
+      });
+
+    logger.info(`User ${newUser.email} created successfully`);
+
+    return newUser;
+  } catch (e) {
+    logger.error(`Error creating user: ${e.message}`);
+    throw e;
+  }
 };
 
-
 export const authenticateUser = async ({
-    email,
-    password
+  email,
+  password
 }) => {
-    try {
-        const [user] = await db
-            .select()
-            .from(users)
-            .where(eq(users.email, email))
-            .limit(1);
+  try {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        const passwordMatches = await comparePassword(
-            password,
-            user.password
-        );
-
-        if (!passwordMatches) {
-            throw new Error('Invalid password');
-        }
-
-        logger.info(`User ${user.email} authenticated successfully`);
-
-        return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-        };
-
-    } catch (e) {
-        logger.error(`Authentication error: ${e.message}`);
-        throw e;
+    if (!user) {
+      throw new Error('User not found');
     }
+
+    const passwordMatches = await comparePassword(
+      password,
+      user.password
+    );
+
+    if (!passwordMatches) {
+      throw new Error('Invalid password');
+    }
+
+    logger.info(`User ${user.email} authenticated successfully`);
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+  } catch (e) {
+    logger.error(`Authentication error: ${e.message}`);
+    throw e;
+  }
 };
