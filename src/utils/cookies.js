@@ -9,18 +9,18 @@ export const cookies = {
   set: (res, name, value, options = {}) => {
     res.cookie(name, value, {
       ...cookies.getOptions(),
-      ...options
+      ...options,
     });
   },
 
   clear: (res, name, options = {}) => {
     res.clearCookie(name, {
       ...cookies.getOptions(),
-      ...options
+      ...options,
     });
   },
 
   get: (req, name) => {
     return req.cookies[name];
-  }
+  },
 };

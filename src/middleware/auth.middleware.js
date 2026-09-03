@@ -8,19 +8,18 @@ export const authenticate = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'No token provided, please sign in'
+        message: 'No token provided, please sign in',
       });
     }
 
     const decoded = jwttoken.verify(token);
     req.user = decoded;
     next();
-
   } catch (e) {
     logger.error('Authentication failed', e);
     return res.status(401).json({
       success: false,
-      message: 'Invalid or expired token'
+      message: 'Invalid or expired token',
     });
   }
 };

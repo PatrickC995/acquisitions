@@ -1,8 +1,15 @@
 import logger from '#config/logger.js';
-import { getAllUsers, getUserById, updateUser, deleteUser } from '#services/users.services.js';
-import { userIdSchema, updateUserSchema } from '#validations/users.validation.js';
+import {
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+} from '#services/users.services.js';
+import {
+  userIdSchema,
+  updateUserSchema,
+} from '#validations/users.validation.js';
 import { formatvalidationError } from '#utils/format.js';
-
 
 export const fetchAllUsers = async (req, res) => {
   try {
@@ -11,7 +18,7 @@ export const fetchAllUsers = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admin users can fetch all users'
+        message: 'Only admin users can fetch all users',
       });
     }
 
@@ -19,19 +26,17 @@ export const fetchAllUsers = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: users
+      data: users,
     });
-
   } catch (e) {
     logger.error('Error fetching users', e);
 
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch users'
+      message: 'Failed to fetch users',
     });
   }
 };
-
 
 export const fetchUserById = async (req, res) => {
   try {
@@ -43,9 +48,7 @@ export const fetchUserById = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        details: formatvalidationError(
-          validationResult.error.issues
-        )
+        details: formatvalidationError(validationResult.error.issues),
       });
     }
 
@@ -54,7 +57,7 @@ export const fetchUserById = async (req, res) => {
     if (req.user.id !== userId && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'You can only access your own information'
+        message: 'You can only access your own information',
       });
     }
 
@@ -62,26 +65,24 @@ export const fetchUserById = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: user
+      data: user,
     });
-
   } catch (e) {
     logger.error('Error fetching user by ID', e);
 
     if (e.message === 'User not found') {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch user'
+      message: 'Failed to fetch user',
     });
   }
 };
-
 
 export const updateUserById = async (req, res) => {
   try {
@@ -93,9 +94,7 @@ export const updateUserById = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        details: formatvalidationError(
-          idValidation.error.issues
-        )
+        details: formatvalidationError(idValidation.error.issues),
       });
     }
 
@@ -105,9 +104,7 @@ export const updateUserById = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        details: formatvalidationError(
-          updateValidation.error.issues
-        )
+        details: formatvalidationError(updateValidation.error.issues),
       });
     }
 
@@ -117,14 +114,14 @@ export const updateUserById = async (req, res) => {
     if (updates.role && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admin users can change user roles'
+        message: 'Only admin users can change user roles',
       });
     }
 
     if (req.user.id !== userId && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'You can only update your own information'
+        message: 'You can only update your own information',
       });
     }
 
@@ -133,26 +130,24 @@ export const updateUserById = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Update successful',
-      data: updatedUser
+      data: updatedUser,
     });
-
   } catch (e) {
     logger.error('Error updating user', e);
 
     if (e.message === 'User not found') {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Failed to update user'
+      message: 'Failed to update user',
     });
   }
 };
-
 
 export const deleteUserById = async (req, res) => {
   try {
@@ -164,9 +159,7 @@ export const deleteUserById = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        details: formatvalidationError(
-          validationResult.error.issues
-        )
+        details: formatvalidationError(validationResult.error.issues),
       });
     }
 
@@ -175,7 +168,7 @@ export const deleteUserById = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admin users can delete users'
+        message: 'Only admin users can delete users',
       });
     }
 
@@ -183,22 +176,21 @@ export const deleteUserById = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'User deleted successfully'
+      message: 'User deleted successfully',
     });
-
   } catch (e) {
     logger.error('Error deleting user', e);
 
     if (e.message === 'User not found') {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Failed to delete user'
+      message: 'Failed to delete user',
     });
   }
 };

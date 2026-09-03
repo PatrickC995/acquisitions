@@ -1,9 +1,6 @@
 import logger from '#config/logger.js';
 import { signupSchema, signinSchema } from '#validations/auth.validation.js';
-import {
-  createUser,
-  authenticateUser
-} from '#services/auth.service.js';
+import { createUser, authenticateUser } from '#services/auth.service.js';
 import { formatvalidationError } from '#utils/format.js';
 import { jwttoken } from '#utils/jwt.js';
 import { cookies } from '#utils/cookies.js';
@@ -15,9 +12,7 @@ export const signup = async (req, res, next) => {
     if (!validationResult.success) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: formatvalidationError(
-          validationResult.error.issues
-        )
+        details: formatvalidationError(validationResult.error.issues),
       });
     }
 
@@ -27,13 +22,13 @@ export const signup = async (req, res, next) => {
       name,
       email,
       password,
-      role
+      role,
     });
 
     const token = jwttoken.sign({
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     });
 
     cookies.set(res, 'token', token);
@@ -46,23 +41,21 @@ export const signup = async (req, res, next) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
-
   } catch (e) {
     logger.error(`Signup error: ${e.message}`);
 
     if (e.message === 'User already exists') {
       return res.status(409).json({
-        error: 'User already exists'
+        error: 'User already exists',
       });
     }
 
     next(e);
   }
 };
-
 
 export const signIn = async (req, res, next) => {
   try {
@@ -71,9 +64,7 @@ export const signIn = async (req, res, next) => {
     if (!validationResult.success) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: formatvalidationError(
-          validationResult.error.issues
-        )
+        details: formatvalidationError(validationResult.error.issues),
       });
     }
 
@@ -81,13 +72,13 @@ export const signIn = async (req, res, next) => {
 
     const user = await authenticateUser({
       email,
-      password
+      password,
     });
 
     const token = jwttoken.sign({
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     });
 
     cookies.set(res, 'token', token);
@@ -100,26 +91,21 @@ export const signIn = async (req, res, next) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
-
   } catch (e) {
     logger.error(`Sign in error: ${e.message}`);
 
-    if (
-      e.message === 'User not found' ||
-            e.message === 'Invalid password'
-    ) {
+    if (e.message === 'User not found' || e.message === 'Invalid password') {
       return res.status(401).json({
-        error: 'Invalid credentials'
+        error: 'Invalid credentials',
       });
     }
 
     next(e);
   }
 };
-
 
 export const signOut = async (req, res, next) => {
   try {
@@ -128,9 +114,8 @@ export const signOut = async (req, res, next) => {
     logger.info('User signed out successfully');
 
     return res.status(200).json({
-      message: 'User signed out successfully'
+      message: 'User signed out successfully',
     });
-
   } catch (e) {
     logger.error(`Sign out error: ${e.message}`);
     next(e);
