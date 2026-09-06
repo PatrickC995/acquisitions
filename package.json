@@ -26,7 +26,9 @@
     "db:studio": "drizzle-kit studio",
     "dev:docker": "sh ./scripts/dev.sh",
     "prod:docker": "sh ./scripts/prod.sh",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:users": "cross-env NODE_OPTIONS=--experimental-vm-modules jest tests/users.test.js",
+    "test:app": "cross-env NODE_OPTIONS=--experimental-vm-modules jest tests/app.test.js"
   },
   "repository": {
     "type": "git",
