@@ -51,10 +51,10 @@ jobs:
           echo "### Docker Build and Push Results" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Docker image built and pushed successfully" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Published Image:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Published Image:** ${{ steps.meta.outputs.images }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
-          for tag in ${{ steps.meta.outputs.tags }}; do
+          echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | while IFS= read -r tag; do
             echo "- \`$tag\`" >> $GITHUB_STEP_SUMMARY
           done
           echo "" >> $GITHUB_STEP_SUMMARY
