@@ -27,12 +27,8 @@ jest.unstable_mockModule('#middleware/security.middleware.js', () => ({
 
 const { default: app } = await import('#src/app.js');
 
-const {
-  getAllUsers,
-  getUserById,
-  updateUser,
-  deleteUser,
-} = await import('#services/users.services.js');
+const { getAllUsers, getUserById, updateUser, deleteUser } =
+  await import('#services/users.services.js');
 
 const { authenticate } = await import('#middleware/auth.middleware.js');
 
@@ -68,29 +64,16 @@ describe('GET /api/users', () => {
       next();
     });
 
+    getAllUsers.mockResolvedValue([adminUser, normalUser, anotherUser]);
 
-    getAllUsers.mockResolvedValue([
-      adminUser,
-      normalUser,
-      anotherUser,
-    ]);
-
-    const response = await request(app)
-      .get('/api/users')
-      .expect(200);
+    const response = await request(app).get('/api/users').expect(200);
 
     expect(response.body).toEqual({
       success: true,
-      data: [
-        adminUser,
-        normalUser,
-        anotherUser,
-      ],
+      data: [adminUser, normalUser, anotherUser],
     });
 
     expect(getAllUsers).toHaveBeenCalled();
-
-
   });
 
   it('should prevent a normal user from fetching all users', async () => {
@@ -99,10 +82,7 @@ describe('GET /api/users', () => {
       next();
     });
 
-
-    const response = await request(app)
-      .get('/api/users')
-      .expect(403);
+    const response = await request(app).get('/api/users').expect(403);
 
     expect(response.body).toEqual({
       success: false,
@@ -110,8 +90,6 @@ describe('GET /api/users', () => {
     });
 
     expect(getAllUsers).not.toHaveBeenCalled();
-
-
   });
 });
 
@@ -122,12 +100,9 @@ describe('GET /api/users/get/:id', () => {
       next();
     });
 
-
     getUserById.mockResolvedValue(normalUser);
 
-    const response = await request(app)
-      .get('/api/users/get/1')
-      .expect(200);
+    const response = await request(app).get('/api/users/get/1').expect(200);
 
     expect(response.body).toEqual({
       success: true,
@@ -135,8 +110,6 @@ describe('GET /api/users/get/:id', () => {
     });
 
     expect(getUserById).toHaveBeenCalledWith(1);
-
-
   });
 
   it('should prevent a user from accessing another user', async () => {
@@ -145,10 +118,7 @@ describe('GET /api/users/get/:id', () => {
       next();
     });
 
-
-    const response = await request(app)
-      .get('/api/users/get/2')
-      .expect(403);
+    const response = await request(app).get('/api/users/get/2').expect(403);
 
     expect(response.body).toEqual({
       success: false,
@@ -156,8 +126,6 @@ describe('GET /api/users/get/:id', () => {
     });
 
     expect(getUserById).not.toHaveBeenCalled();
-
-
   });
 
   it('should allow an admin to access another user', async () => {
@@ -166,12 +134,9 @@ describe('GET /api/users/get/:id', () => {
       next();
     });
 
-
     getUserById.mockResolvedValue(anotherUser);
 
-    const response = await request(app)
-      .get('/api/users/get/2')
-      .expect(200);
+    const response = await request(app).get('/api/users/get/2').expect(200);
 
     expect(response.body).toEqual({
       success: true,
@@ -179,8 +144,6 @@ describe('GET /api/users/get/:id', () => {
     });
 
     expect(getUserById).toHaveBeenCalledWith(2);
-
-
   });
 
   it('should return 404 when the user does not exist', async () => {
@@ -189,21 +152,14 @@ describe('GET /api/users/get/:id', () => {
       next();
     });
 
+    getUserById.mockRejectedValue(new Error('User not found'));
 
-    getUserById.mockRejectedValue(
-      new Error('User not found')
-    );
-
-    const response = await request(app)
-      .get('/api/users/get/999')
-      .expect(404);
+    const response = await request(app).get('/api/users/get/999').expect(404);
 
     expect(response.body).toEqual({
       success: false,
       message: 'User not found',
     });
-
-
   });
 });
 
@@ -213,7 +169,6 @@ describe('PUT /api/users/update/:id', () => {
       req.user = normalUser;
       next();
     });
-
 
     const updatedUser = {
       ...normalUser,
@@ -235,14 +190,9 @@ describe('PUT /api/users/update/:id', () => {
       data: updatedUser,
     });
 
-    expect(updateUser).toHaveBeenCalledWith(
-      1,
-      {
-        name: 'Updated Name',
-      }
-    );
-
-
+    expect(updateUser).toHaveBeenCalledWith(1, {
+      name: 'Updated Name',
+    });
   });
 
   it('should prevent a user from updating another user', async () => {
@@ -250,7 +200,6 @@ describe('PUT /api/users/update/:id', () => {
       req.user = normalUser;
       next();
     });
-
 
     const response = await request(app)
       .put('/api/users/update/2')
@@ -265,8 +214,6 @@ describe('PUT /api/users/update/:id', () => {
     });
 
     expect(updateUser).not.toHaveBeenCalled();
-
-
   });
 
   it('should prevent a normal user from changing their role', async () => {
@@ -274,7 +221,6 @@ describe('PUT /api/users/update/:id', () => {
       req.user = normalUser;
       next();
     });
-
 
     const response = await request(app)
       .put('/api/users/update/1')
@@ -289,8 +235,6 @@ describe('PUT /api/users/update/:id', () => {
     });
 
     expect(updateUser).not.toHaveBeenCalled();
-
-
   });
 
   it('should allow an admin to update another user', async () => {
@@ -298,7 +242,6 @@ describe('PUT /api/users/update/:id', () => {
       req.user = adminUser;
       next();
     });
-
 
     const updatedUser = {
       ...anotherUser,
@@ -320,14 +263,9 @@ describe('PUT /api/users/update/:id', () => {
       data: updatedUser,
     });
 
-    expect(updateUser).toHaveBeenCalledWith(
-      2,
-      {
-        name: 'Updated By Admin',
-      }
-    );
-
-
+    expect(updateUser).toHaveBeenCalledWith(2, {
+      name: 'Updated By Admin',
+    });
   });
 });
 
@@ -337,7 +275,6 @@ describe('DELETE /api/users/delete/:id', () => {
       req.user = adminUser;
       next();
     });
-
 
     deleteUser.mockResolvedValue(undefined);
 
@@ -351,8 +288,6 @@ describe('DELETE /api/users/delete/:id', () => {
     });
 
     expect(deleteUser).toHaveBeenCalledWith(2);
-
-
   });
 
   it('should prevent a normal user from deleting users', async () => {
@@ -360,7 +295,6 @@ describe('DELETE /api/users/delete/:id', () => {
       req.user = normalUser;
       next();
     });
-
 
     const response = await request(app)
       .delete('/api/users/delete/2')
@@ -372,7 +306,6 @@ describe('DELETE /api/users/delete/:id', () => {
     });
 
     expect(deleteUser).not.toHaveBeenCalled();
-
   });
 
   it('should return 404 when the user does not exist', async () => {
@@ -381,9 +314,7 @@ describe('DELETE /api/users/delete/:id', () => {
       next();
     });
 
-    deleteUser.mockRejectedValue(
-      new Error('User not found')
-    );
+    deleteUser.mockRejectedValue(new Error('User not found'));
 
     const response = await request(app)
       .delete('/api/users/delete/999')
@@ -393,6 +324,5 @@ describe('DELETE /api/users/delete/:id', () => {
       success: false,
       message: 'User not found',
     });
-
   });
 });
