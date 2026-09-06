@@ -1,5 +1,11 @@
+import { jest } from '@jest/globals';
 import request from 'supertest';
-import app from '#src/app.js';
+
+jest.unstable_mockModule('#middleware/security.middleware.js', () => ({
+  default: (req, res, next) => next(),
+}));
+
+const { default: app } = await import('#src/app.js');
 
 describe('API Endpoints', () => {
   describe('GET /health', () => {
@@ -31,11 +37,12 @@ describe('API Endpoints', () => {
     });
   });
 
-    describe('GET /', () => {
-     it('should return Hello from Acquisitions API', async () => {
+  describe('GET /', () => {
+    it('should return Hello from Acquisitions API', async () => {
       const response = await request(app).get('/').expect(200);
+
       expect(response.text).toBe('Hello from Acquisitions!');
     });
   });
-
 });
+
