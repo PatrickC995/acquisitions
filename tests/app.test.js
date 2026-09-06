@@ -30,4 +30,12 @@ describe('API Endpoints', () => {
       expect(response.body).toHaveProperty('error', 'Route not found');
     });
   });
+
+    describe('GET /', () => {
+     it('should return Hello from Acquisitions API', async () => {
+      const response = await request(app).get('/').expect(200);
+      expect(response.text).toBe('Hello from Acquisitions!');
+    });
+  });
+
 });
